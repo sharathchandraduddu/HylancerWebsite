@@ -1,0 +1,26 @@
+{
+    "compilerOptions": {
+      "target": "es5",
+      "module": "esnext",
+      "jsx": "react-jsx",
+      "moduleResolution": "node",
+      "strict": true,
+      "allowSyntheticDefaultImports": true,
+      "esModuleInterop": true,
+      "skipLibCheck": true,
+      "forceConsistentCasingInFileNames": true,
+      "allowImportingTsExtensions": true,  // Enable this option
+      "resolveJsonModule": true,
+      "isolatedModules": true,
+      "noEmit": true,
+      "types": ["node", "react", "react-dom", "@types/react"] // Ensures TypeScript has the necessary types for SVG and React
+    },
+    "include": [
+      "src/**/*.ts",
+      "src/**/*.tsx",
+      "src/**/*.svg",
+      "src/**/*.d.ts"  
+    ],
+    "exclude": ["node_modules"]
+  }
+  
