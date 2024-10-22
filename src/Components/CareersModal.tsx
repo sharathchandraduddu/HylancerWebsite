@@ -10,7 +10,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { ReactComponent as Mail } from './images/Mail.svg';
 import { ReactComponent as Fi_Upload } from './images/Fi_Upload.svg';
-import emailjs from 'emailjs-com'; // Make sure to install emailjs-com package
+import emailjs from 'emailjs-com';
 
 const modalStyle = {
   position: 'absolute' as 'absolute',
@@ -53,7 +53,6 @@ const submitButtonStyle = {
   },
   width: 'fit-content',
 };
-
 const dropzoneStyle = {
   display: 'flex',
   flexDirection: 'column' as 'column',
@@ -73,7 +72,11 @@ interface CareersModalProps {
   isContactUs?: boolean;
 }
 
-const FileUploadSection: React.FC<{ onFileChange: (file: File) => void; fileName: string; onRemove: () => void; }> = ({ onFileChange, fileName, onRemove }) => {
+const FileUploadSection: React.FC<{
+  onFileChange: (file: File) => void;
+  fileName: string;
+  onRemove: () => void;
+}> = ({ onFileChange, fileName, onRemove }) => {
   const onDrop = (acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
       onFileChange(acceptedFiles[0]);
@@ -115,43 +118,84 @@ const FileUploadSection: React.FC<{ onFileChange: (file: File) => void; fileName
 
 const CareersModal: React.FC<CareersModalProps> = ({ open, onClose, isContactUs }) => {
   const [file, setFile] = useState<File | null>(null);
+  const [fileBase64, setFileBase64] = useState<string | null>(null); // separate state for base64
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [message, setMessage] = useState('');
 
-  const handleSubmit = () => {
-    if (!name || !email || (isContactUs ? false : !file)) {
-      alert('Name, Email, and Resume are mandatory fields. Please fill them out before submitting.');
-      return;
-    }
-    
-    const templateParams = {
-      name: name,
-      email: email,
-      phone: phone,
-      message: message,
-      file: file?.name || 'No file uploaded',
-    };
-
-    emailjs.send('service_bmto2y2', 'template_w3gfweo', templateParams, 'Dk91YZ1wNSGcKxIf2')
-      .then((response) => {
-          console.log('SUCCESS!', response.status, response.text);
-          alert('Your message has been submitted successfully!');
-          onClose(); // Close the modal after successful submission
-      }, (error) => {
-          console.error('Failed to send email:', error); // More detailed error logging
-          alert('There was an error sending your message. Please try again.');
-      });
+  // Convert file to base64 format
+  const convertFileToBase64 = (file: File) => {
+    return new Promise<string | ArrayBuffer | null>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
   };
 
+  const handleFileChange = async (selectedFile: File) => {
+    try {
+      const base64File = await convertFileToBase64(selectedFile);
+      setFile(selectedFile);
+      setFileBase64(base64File as string); // set base64 as a string
+    } catch (error) {
+      console.error('File conversion error:', error);
+    }
+  };
+
+  const handleSubmit = async () => {
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('email', email);
+    formData.append('phone', phone);
+    formData.append('message', message);
+  
+    if (file) {
+      const reader = new FileReader();
+  
+      reader.readAsDataURL(file);
+  
+      reader.onloadend = async () => {
+        // Check if reader.result is a string before using `split`
+        if (typeof reader.result === 'string') {
+          // const base64File = reader.result.split(',')[1]; // Base64 file content
+          // formData.append('file', base64File);
+          // formData.append('fileName', file.name);
+          // formData.append('fileType', file.type);
+  
+          try {
+            const response = await fetch('https://script.google.com/macros/s/AKfycbzpmIfPSW-XiS2bJ24K_m6_0nSur42EtuzEzi8BnMLX0vTPrN6WdMIz-NR9-S0z_H64Cw/exec', {
+              method: 'POST',             
+              body: formData,
+            });
+  
+            const result = await response.json();
+            if (result.success) {
+              alert('File uploaded successfully!');
+            } else {
+              alert('Failed to upload the file.');
+            }
+          } catch (error) {
+            console.error('Error:', error);
+          }
+        } else {
+          alert('Failed to read the file. Please try again.');
+        }
+      };
+  
+      reader.onerror = () => {
+        alert('There was an error reading the file.');
+      };
+    } else {
+      alert('No file selected.');
+    }
+  };
+  
+  
+  
   return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      aria-labelledby="careers-modal-title"
-      aria-describedby="careers-modal-description"
-    >
+    <Modal open={open} onClose={onClose} aria-labelledby="careers-modal-title" aria-describedby="careers-modal-description">
       <Box sx={modalStyle}>
         <IconButton onClick={onClose} sx={closeButtonStyle}>
           <CloseIcon />
@@ -188,7 +232,6 @@ const CareersModal: React.FC<CareersModalProps> = ({ open, onClose, isContactUs 
               required
             />
           </Box>
-
           <Box flex={1}>
             <Typography variant="body1" gutterBottom>
               Phone
@@ -207,10 +250,10 @@ const CareersModal: React.FC<CareersModalProps> = ({ open, onClose, isContactUs 
             <Typography variant="body1" sx={{ mt: 1 }} gutterBottom>
               Upload Resume <span style={{ color: 'red' }}>*</span>
             </Typography>
-            <FileUploadSection 
-              onFileChange={setFile} 
-              fileName={file ? file.name : ''} 
-              onRemove={() => setFile(null)}
+            <FileUploadSection
+              onFileChange={handleFileChange}
+              fileName={file ? file.name : ''}
+              onRemove={() => { setFile(null); setFileBase64(null); }}
             />
           </>
         )}
@@ -222,17 +265,14 @@ const CareersModal: React.FC<CareersModalProps> = ({ open, onClose, isContactUs 
           multiline
           rows={3}
           variant="outlined"
-          placeholder="Write your message here..."
+          placeholder="Write your message here"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          sx={{ mb: 1 }}
+          sx={{ mb: 2 }}
         />
-
-        <Box sx={{ textAlign: 'left' }}>
-          <Button variant="contained" sx={submitButtonStyle} onClick={handleSubmit}>
-            Submit
-          </Button>
-        </Box>
+        <Button onClick={handleSubmit} sx={submitButtonStyle}>
+          Submit
+        </Button>
       </Box>
     </Modal>
   );

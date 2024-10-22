@@ -2,20 +2,34 @@ import React from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Card from '@mui/material/Card';
-import CardMedia from '@mui/material/CardMedia';
-import { ReactComponent as curvedline } from './images/curvedline.svg';
-import { ReactComponent as connection } from './images/connection.svg';
+import { ReactComponent as CurvedLine } from './images/curvedline.svg';
+import { ReactComponent as Connection } from './images/connection.svg';
+import { ReactComponent as CardLogo } from './images/CardLogo.svg';
+import { ReactComponent as Teacher } from './images/Teacher.svg';
+import { ReactComponent as MusicTeacher } from './images/MusicTeacher.svg';
+import { ReactComponent as Yoga } from './images/Yoga.svg';
+import { ReactComponent as Physiotherapist } from './images/Physiotherapist.svg';
+import { ReactComponent as PersonalTrainer } from './images/PersonalTrainer.svg';
+import { ReactComponent as Beautician } from './images/Beautician.svg';
 
 const LandingPage: React.FC = () => {
-    // const cardImages = [
-    //     'https://via.placeholder.com/250/F5C10A/FFFFFF?text=Image+1', // Placeholder image 1 with background color
-    //     'https://via.placeholder.com/250/F5C10A/FFFFFF?text=Image+2', // Placeholder image 2 with background color
-    //     'https://via.placeholder.com/250/F5C10A/FFFFFF?text=Image+3', // Placeholder image 3 with background color
-    //     'https://via.placeholder.com/250/F5C10A/FFFFFF?text=Image+4', // Placeholder image 4 with background color
-    //     'https://via.placeholder.com/250/F5C10A/FFFFFF?text=Image+5', // Placeholder image 5 with background color
-    //     'https://via.placeholder.com/250/F5C10A/FFFFFF?text=Image+6', // Placeholder image 6 with background color
-    //   ];
-  const cardImage = require('./images/Yellow.jpg'); // Import the local image
+  const cardImages = [
+    Teacher,
+    PersonalTrainer,
+    Physiotherapist,
+    MusicTeacher,
+    Yoga,
+    Beautician,
+  ];
+
+  const cardTexts = [
+    'Teacher',
+    'Personal Trainer',
+    'Physiotherapist',
+    'Music Teacher',
+    'Yoga Instructor',
+    'Beautician',
+  ];
 
   return (
     <>
@@ -35,7 +49,7 @@ const LandingPage: React.FC = () => {
           <Box component="span" sx={{ position: 'relative', display: 'inline-block' }}>
             Job
             <Box
-              component={curvedline}
+              component={CurvedLine}
               sx={{
                 position: 'absolute',
                 bottom: -10,
@@ -61,7 +75,7 @@ const LandingPage: React.FC = () => {
         }}
       >
         <Box
-          component={connection}
+          component={Connection}
           sx={{
             position: 'absolute',
             top: '53%',
@@ -83,15 +97,14 @@ const LandingPage: React.FC = () => {
             zIndex: 1,
           }}
         >
-          {[...Array(6)].map((_, index) => (
+          {cardImages.map((SvgComponent, index) => (
             <Box
               key={index}
               sx={{
-                transform: index % 2 === 0 ? 'translateY(-30px)' : 'translateY(30px)',
+                transform: index % 2 === 0 ? 'translateY(-40px)' : 'translateY(30px)',
                 marginLeft: index === 0 ? 0 : '-80px',
-                zIndex: 6 - index,
                 transition: 'transform 0.3s ease-in-out',
-                width: 'calc(100% / 4)',
+                width: 'calc(100% / 2)',
               }}
             >
               <Card
@@ -99,20 +112,36 @@ const LandingPage: React.FC = () => {
                   width: '100%',
                   height: 250,
                   borderRadius: '16px',
+                  position: 'relative', // To position the SVG and text absolutely
                 }}
               >
-                <CardMedia
-                  component="img"
-                  height="250"
-                  image={cardImage} // Use the local image for the card
-                  alt={`Card ${index + 1}`}
+                <Box
                   sx={{
                     backgroundColor: '#F5C10A',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
+                    height: '100%',
                   }}
-                />
+                >
+                  <SvgComponent width="100%" height="100%" /> {/* Render SVG component */}
+                </Box>
+                {/* SVG and Fixed Text Below */}
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    bottom: 8,
+                    left: 8,
+                    display: 'flex',
+                    flexDirection: 'column', // Ensure SVG and text are stacked
+                    alignItems: 'left',
+                  }}
+                >
+                  <CardLogo width="24px" height="24px" style={{ marginTop: 1,border:'1px solid black',borderRadius:'5px'}} /> {/* Bottom-left SVG */}
+                  <Typography variant="body2" sx={{ mt: 1, color: 'white', fontWeight: 700 }}>
+                    {cardTexts[index]} {/* Fixed text */}
+                  </Typography>
+                </Box>
               </Card>
             </Box>
           ))}

@@ -1,16 +1,17 @@
+// index.tsx
+
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+import ReactDOM from 'react-dom';
 import './index.css';
-import App from './App.tsx';
-import reportWebVitals from './web-vitals';
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
-root.render(
+import App from './App';
+import reportWebVitals from './reportWebVitals'; // Import reportWebVitals
+
+ReactDOM.render(
   <React.StrictMode>
     <App />
-  </React.StrictMode>
+  </React.StrictMode>,
+  document.getElementById('root')
 );
 
-
+// Start measuring performance in your app
 reportWebVitals();

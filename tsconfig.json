@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-      "target": "es5",
+      "target": "es6",
       "module": "esnext",
       "jsx": "react-jsx",
       "moduleResolution": "node",
@@ -13,6 +13,7 @@
       "resolveJsonModule": true,
       "isolatedModules": true,
       "noEmit": true,
+      "baseUrl": "./src",
       "types": ["node", "react", "react-dom", "@types/react"] // Ensures TypeScript has the necessary types for SVG and React
     },
     "include": [
